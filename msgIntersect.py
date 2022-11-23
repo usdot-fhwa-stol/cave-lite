@@ -1,13 +1,12 @@
 # Receive, Decode, Broadcast SAE J2735 Messages
 import J2735_201603_combined
-import signal, sys
+from threading import Thread
 import os.path
 import socket
 import binascii
 from time import sleep
 # from gpiozero import LED
 import datetime
-# import trafficSignal
 
 
 def send(ip_send, port_send, msg, broadcast):
@@ -19,12 +18,13 @@ def send(ip_send, port_send, msg, broadcast):
 
 def writePhase(phase): 
     fout.writelines(["Phase ", str(phase), ': '])
-    return None
 
-def writeState(currentState):
-    phaseTwoState = currentState
-    fout.writelines([str(phaseTwoState),  "\n"])
-    return phaseTwoState
+def writeState(state):
+    fout.writelines([str(state),  "\n"])
+
+def writeTime(seconds, millisec):
+    countdown = (seconds-millisec)*100
+    fout.writelines(["Time to next state: ", str(round(countdown,1)), "\n"])
 
 def writeLog():
     path = '/home/willdesk/Documents/cave-lite/logs/' # '/home/cave/cave-lite/logs/'
@@ -37,25 +37,6 @@ def writeLog():
     fout = open(logPath, 'w')
     return fout
 
-# def signalOut(phaseState):
-#     state = phaseState
-#     print("In signalOut\n")
-#     if (state() == "stop-And-Remain") :
-#         print("red\n")
-#         object.self.C.delete(object.self.greenLight)
-#         object.self.light["1"].setRed()
-#     elif (state() == "protected-clearance") :
-#         print("yellow\n")
-#         object.self.C.delete(object.self.redLight)
-#         object.self.light["1"].setYellow()
-#     elif (state() == "protected-Movement-Allowed") :
-#         print("green\n")
-#         object.self.C.delete(object.self.yellowLight)
-#         object.self.light["1"].setGreen()
-#     else: object.self.light["1"].setRed()
-
-# object = trafficSignal.intersection(top)
-
 # uncomment to declare LED pins and set initial states for traffic light hardware
 # red = LED(17)
 # yellow = LED(27)
@@ -65,7 +46,7 @@ def writeLog():
 # green.off()
 
 print('Starting intersect.')
-ip_listen = '192.168.0.156'
+ip_listen = '127.0.0.1'
 ip_send = '192.168.0.255'
 broadcast = '255.255.255.255'
 port_listen = 1516 # listen to Immediate Forward Plugin
@@ -77,7 +58,7 @@ fout = writeLog()
 
 msgIds=['0013'] # this can be updated to include other J2735 PSIDs
 print("Receiving Data")
-while(1):
+def main():
     data = str(sk_listen.recvfrom(10000)[0])
     data = ''.join(data.split())
     # print(data)
@@ -105,14 +86,17 @@ while(1):
                     minEndTime = decode()['value'][1]['intersections'][0]['states'][phase]['state-time-speed'][0]['timing']['minEndTime']
                     if (currentPhase == 2) : # additional phases may be included as the same if-statements
                         writeState(currentState)
-                        writePhase(phase)
+                        writePhase(currentPhase)
                         timeEndSec = minEndTime/600
+                        return(currentState)
                     elif (currentPhase == 22) :
-                        timeEndDouble = minEndTime/600
-                    
-                countdown = (timeEndSec-timeEndDouble)*100
-                fout.writelines(["Time to next state: ", str(round(countdown,1)), "\n"])
-
+                        timeEndMilliSec = minEndTime/600
+                writeTime(timeEndSec, timeEndMilliSec)
                 send(ip_send, port_send, msg, broadcast)
                 sleep(0.1)
-                break
+
+try:
+    t = Thread(target = main, args=(),  daemon = True) 
+    t.start()
+except:
+    print("Something didn't work")

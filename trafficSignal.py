@@ -1,9 +1,10 @@
+from threading import Thread
 from tkinter import font
 import tkinter as tk
-# from msgIntersect import writeState
+from msgIntersect import main
 
 class traffic_signal:
-  def __init__(self,name,C,offset):
+  def __init__(self, name, C, offset):
     self.name = name # name used as a label over the top of the signal
     self.C = C # canvas to draw on
     self.offset = offset # position left to right for this instance to draw its light
@@ -28,30 +29,65 @@ class traffic_signal:
     self.C.delete(self.yellowLight)
     self.C.delete(self.greenLight)
 
-class intersection:
-  def __init__(self,top):
+class signal:
+  def __init__(self, top, currentState):
     self.top = top # hold a window frame
     self.C = tk.Canvas(self.top, bg="white", height=400, width=215)
-    self.light={} # hold n traffic signals
-    self.light["1"] = traffic_signal("",self.C,55)
+    # self.light = traffic_signal("",self.C,55)
+    # self.C.pack()
+
+    # self.C.after(2000, self.red)
+    if (currentState == "stop-And-Remain") : 
+      self.red
+    elif (currentState == "protected-Clearance") : 
+      self.yellow
+    elif (currentState == "protected-Movement-Allowed") : 
+      self.green
+    else: self.clear
+
+  def red(self):
+    self.light = traffic_signal("",self.C,55)
+    self.C.pack()
+    self.light.setRed()
+
+  def yellow(self):
+    self.light = traffic_signal("",self.C,55)
+    self.C.pack()
+    self.light.setYellow()
+
+  def green(self):
+    self.light = traffic_signal("",self.C,55)
+    self.C.pack()
+    self.light.setGreen()
+
+  def clear(self):
+    self.light = traffic_signal("",self.C,55)
     self.C.pack()
 
-    self.light["1"].setRed()
+def status(main):
+  status = main
+  return status
 
-    # Create a statemachine here
-    # if (writeState() == "stop-And-Remain") :
-    #   self.C.delete(self.greenLight)
-    #   self.light["1"].setRed()
-    # elif (writeState() == "protected-clearance") :
-    #   self.C.delete(self.redLight)
-    #   self.light["1"].setYellow()
-    # elif (writeState() == "protected-Movement-Allowed") :
-    #   self.C.delete(self.yellowLight)
-    #   self.light["1"].setGreen()
-    # else: self.light["1"].setRed()
-
-# start simulation
-print("traffic_signal")
+print("Starting Traffic Signal\n")
 top = tk.Tk() # create a window frame
-si = intersection(top) # construct intersection
-top.mainloop() # start GUI
+def gen(top):
+  # start simulation
+  print(status())
+  signal(top, status())
+
+def loop(top):
+  top.mainloop() # start GUI
+
+try:
+  s = Thread(target = status, args=(main()),  daemon = True) 
+  s.start()
+except:
+  print("Something didn't work in retrieving status.")
+
+try:
+  t = Thread(target = status, args=(top),  daemon = True) 
+  t.start()
+except:
+  print("Something didn't work in generation.")
+
+loop(top)

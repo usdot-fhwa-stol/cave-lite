@@ -9,7 +9,7 @@ def signal_handler(sig, frame):
     sys.exit(0)  
 
 # send payload to IP + port
-ip = '192.168.0.156' #input('Enter IP Address to send to: ')
+ip = '127.0.0.1' #input('Enter IP Address to send to: ')
 port = '6053' #input('Enter Port to send to: ')
 sk = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
 
