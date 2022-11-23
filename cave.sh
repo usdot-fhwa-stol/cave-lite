@@ -25,9 +25,9 @@ extract() {
 
 processing() {
     #extract # uncomment if different SPAT file will be used
-    python3 $directory/msgIntersect.py &
+    # python3 $directory/msgIntersect.py &
     python3 $directory/tscScript.py &
-    # python3 $directory/trafficSignal.py &
+    python3 $directory/trafficSignal.py &
 }
 
 trap hupexit HUP
