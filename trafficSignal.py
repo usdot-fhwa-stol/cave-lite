@@ -1,7 +1,9 @@
 from threading import Thread
 from tkinter import font
 import tkinter as tk
-from msgIntersect import main
+import msgIntersect
+from time import sleep
+
 
 class traffic_signal:
   def __init__(self, name, C, offset):
@@ -30,64 +32,64 @@ class traffic_signal:
     self.C.delete(self.greenLight)
 
 class signal:
-  def __init__(self, top, currentState):
+  def __init__(self, top):
     self.top = top # hold a window frame
     self.C = tk.Canvas(self.top, bg="white", height=400, width=215)
-    # self.light = traffic_signal("",self.C,55)
-    # self.C.pack()
-
-    # self.C.after(2000, self.red)
-    if (currentState == "stop-And-Remain") : 
-      self.red
-    elif (currentState == "protected-Clearance") : 
-      self.yellow
-    elif (currentState == "protected-Movement-Allowed") : 
-      self.green
-    else: self.clear
 
   def red(self):
     self.light = traffic_signal("",self.C,55)
     self.C.pack()
     self.light.setRed()
+    print("red")
 
   def yellow(self):
     self.light = traffic_signal("",self.C,55)
     self.C.pack()
     self.light.setYellow()
+    print("yellow")
 
   def green(self):
     self.light = traffic_signal("",self.C,55)
     self.C.pack()
     self.light.setGreen()
+    print("green")
 
   def clear(self):
     self.light = traffic_signal("",self.C,55)
     self.C.pack()
+    print("clear")
 
-def status(main):
-  status = main
-  return status
 
-print("Starting Traffic Signal\n")
-top = tk.Tk() # create a window frame
-def gen(top):
-  # start simulation
-  print(status())
-  signal(top, status())
+def setState():
+  while(1):
+    updating = msgIntersect.all
+    status(msgIntersect.updatingState)
+    sleep(0.1)
+
+def status(status):
+  if (status == "stop-And-Remain"): 
+    state.red()
+  elif (status == "protected-Clearance"): 
+    state.yellow()
+  elif (status == "protected-Movement-Allowed"): 
+    state.green()
+  else: state.clear()
 
 def loop(top):
-  top.mainloop() # start GUI
+  top.mainloop()
 
-try:
-  s = Thread(target = status, args=(main()),  daemon = True) 
-  s.start()
-except:
-  print("Something didn't work in retrieving status.")
+print("Starting Traffic Signal\n")
+global top
+global state
+top = tk.Tk() # create a window frame
+state = signal(top)
+setState()
+# s = Thread(target = setState, args=(),  daemon = True)
+# s.start()
 
-try:
-  t = Thread(target = status, args=(top),  daemon = True) 
-  t.start()
-except:
-  print("Something didn't work in generation.")
+def main():
+  print("outside")
+  # t = Thread(target=loop, args=(), daemon=True)
+  # t.start()
 
-loop(top)
+# main()
