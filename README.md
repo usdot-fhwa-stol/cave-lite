@@ -1,3 +1,4 @@
+## Overview
 CAVe-Lite is the smaller version of CAVe-in-a-Box. CAVe-Lite is meant to be used in a classroom setting to teach and demonstrate
 the network connections and message flow for SAE J2735 messages. This script will allow for a SPaT (Signal Phase and Timing) message to 
 be translated from a pre-recorded Traffic Signal Controller (NTCIP 1202) message. The SPaT Message is broadcast to the network the 
@@ -8,7 +9,7 @@ Green state = 15 seconds
 Yellow state = 3 seconds
 Red state = Green + Yellow + 2 second all phases red (20 seconds)
 
-Prerequisites:
+## Prerequisites:
 V2X Hub (arm64, latest) https://github.com/usdot-fhwa-OPS/V2X-Hub; https://usdot-carma.atlassian.net/wiki/spaces/V2XH/pages/1886158849/V2X-Hub+Docker+Deployment
 python3  `sudo apt install python3`
 pip3     `sudo apt install python3-pip`
@@ -18,7 +19,7 @@ gpiozero `pip3 install gpiozero`
 CAVE Raspberry Pi default Static IP set to: 192.168.0.146
 
 
-To use:
+## Usage
 1. Run:
 	```
 	$ cd ~/cave-lite/
