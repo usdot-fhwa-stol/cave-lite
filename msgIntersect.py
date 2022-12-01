@@ -2,6 +2,7 @@
 import J2735_201603_combined
 from threading import Thread
 import os.path
+import os
 import socket
 import binascii
 from time import sleep
@@ -28,7 +29,7 @@ def writeTime(seconds, millisec):
     fout.writelines(["Time to next state: ", str(countdown), "\n"])
 
 def writeLog():
-    path = '/home/willdesk/Documents/cave-lite/logs/' # '/home/cave/cave-lite/logs/'
+    path = os.getcwd() + "/logs/"
     stamp = str(datetime.datetime.now())
     timestamp = stamp.replace("-", "_")
     timestamp = timestamp.replace(" ", "_")
