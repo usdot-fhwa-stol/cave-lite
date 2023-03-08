@@ -3,6 +3,8 @@
 
 directory=$(pwd)
 
+mkdir -p logs
+
 intexit() {
     # Kill all subprocesses (all processes in the current process group)
     kill -HUP -$$

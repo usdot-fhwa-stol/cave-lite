@@ -3,10 +3,12 @@ import J2735_201603_combined
 from threading import Thread
 import os.path
 import os
+import sys
 import socket
 import binascii
 from time import sleep
-# from gpiozero import LED # uncomment if physical digital signal head will be used
+## uncomment if physical digital signal head will be used
+# from gpiozero import LED
 import datetime
 
 
@@ -106,4 +108,4 @@ try:
     t = Thread(target = all, args=(),  daemon = True) 
     t.start()
 except:
-    print("Something didn't work")
+    print("Starting thread did not work")

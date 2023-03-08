@@ -13,17 +13,17 @@
 #########################################################################
 
 # Declare CAVE Directory
-DIR=/home/cave/cave-lite
+DIR=$PWD
 script=cave.sh
 
 # Start or Stop CAVE
 cave_start()
 {
     # Ensure logs directory exists and is writable
-    mkdir -p ${DIR}/logs
-    chmod 777 ${DIR}/logs
+    mkdir -p $DIR/logs
+    chmod 777 $DIR/logs
 
-    bash ${DIR}/${script} &
+    bash $DIR/$script &
 }
 
 cave_stop()
@@ -33,7 +33,7 @@ cave_stop()
 
 cave_echo()
 {
-    cd ${DIR}/logs/
+    cd $DIR/logs/
     latest_log=$(ls -t *.log | head -1)
     tail -f $latest_log
 }
