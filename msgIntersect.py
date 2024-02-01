@@ -1,9 +1,9 @@
-# Receive, Decode, Broadcast SAE J2735 Messages
+## Receive, Decode, Broadcast SAE J2735 Messages
+
 import J2735_201603_combined
 from threading import Thread
 import os.path
 import os
-import sys
 import socket
 import binascii
 from time import sleep
@@ -20,15 +20,18 @@ def send(ip_send, port_send, msg, broadcast):
     sk_send.close()
 
 def writePhase(phase): 
-    fout.writelines(["Phase ", str(phase), ': '])
+    # fout.writelines(["Phase ", str(phase), ': '])
+    print("Phase ", str(phase), ': ')
 
 def writeState(state):
-    fout.writelines([str(state),  "\n"])
+    # fout.writelines([str(state),  "\n"])
+    print(str(state),  "\n")
 
 def writeTime(seconds, millisec):
     global countdown
-    countdown = round((seconds-millisec)*100, 1)
-    fout.writelines(["Time to next state: ", str(countdown), "\n"])
+    countdown = round(seconds-millisec, 1)
+    # fout.writelines(["Time to next state: ", str(countdown), "\n"])
+    print("Time to next state: ", str(countdown), "\n")
 
 def writeLog():
     path = os.getcwd() + "/logs/"
@@ -60,7 +63,8 @@ sk_listen.bind((ip_listen, port_listen))
 updatingState = None
 countdown = None
 
-fout = writeLog()
+## uncomment all fout.* to write logs
+# fout = writeLog()
 
 msgIds=['0013'] # this can be updated to include other J2735 PSIDs
 print("Receiving Data")
@@ -69,23 +73,21 @@ def all():
     while(1):
         data = str(sk_listen.recvfrom(10000)[0])
         data = ''.join(data.split())
-        # print(data)
         for id in msgIds:
             idx = data.find(id)
-            # extract, decode, and send message from stream
+            
+            ## extract, decode, and send message from stream
             if(idx > -1 ):
-                # extract
+                ## extract
                 if (int('0x'+data[idx+4],16)==8):
                     lenstr=int('0x'+data[idx+5:idx+8],16)*2+6 
                 else:
                     lenstr=int('0x'+data[idx+4:idx+6],16)*2+6
                 if(lenstr <= len(data)-idx+1):
-                    # decode
+                    ## decode
                     msg = data[idx:idx+lenstr].encode('utf-8')
                     decode = J2735_201603_combined.DSRC.MessageFrame
                     decode.from_uper(binascii.unhexlify(msg))
-                    # decodedStr = str(decode())
-                    # print(decodedStr, '\n')
 
                     instersectionPhaseArray = decode()['value'][1]['intersections'][0]['states']
                     for phase in range(len(instersectionPhaseArray)):
@@ -95,12 +97,15 @@ def all():
                         if (currentPhase == 2) : # additional phases may be included as the same if-statements
                             writeState(currentState)
                             writePhase(currentPhase)
-                            timeEndSec = minEndTime/600
+                            timeEndSec = minEndTime/6
+                            print("timeEndSec: ", timeEndSec*6)
                             updatingState = currentState
                         elif (currentPhase == 22) :
-                            timeEndMilliSec = minEndTime/600
+                            timeEndMilliSec = minEndTime/6
+                            print("timeEndMilliSec: ", timeEndMilliSec*6)
                     writeTime(timeEndSec, timeEndMilliSec)
-                    # send
+
+                    ## send
                     send(ip_send, port_send, msg, broadcast)
                     sleep(0.1)
 

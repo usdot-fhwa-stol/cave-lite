@@ -4,7 +4,7 @@ the network connections and message flow for SAE J2735 messages. This script wil
 be translated from a pre-recorded Traffic Signal Controller (NTCIP 1202) message. The SPaT Message is broadcast to the network the 
 Raspberry Pi is connected to. A traffic light and CARMA 1-Tenth or CAVe-Mobile vehicle are used to demonstrate how SAE J2735 Messages can be used. 
 
-Instructions for downloading and using CAVe-Mobile can be found in the cave-mobile repository.
+Instructions for downloading and using CAVe-Mobile can be found in the cave-mobile folder.
 
 The attached NTCIP 1202 cycle contains the following signal phases:
 Green state = 15 seconds
