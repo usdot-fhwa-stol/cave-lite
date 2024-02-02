@@ -1,16 +1,18 @@
 ## Receive, Decode, Broadcast SAE J2735 Messages
 
-import J2735_201603_combined
-from threading import Thread
-import os.path
 import os
+import os.path
+import sys
 import socket
 import binascii
-from time import sleep
-## uncomment if physical digital signal head will be used
-# from gpiozero import LED
 import datetime
+from time import sleep
+from threading import Thread
+# from gpiozero import LED  # uncomment if physical digital signal head will be used
 
+def add_asn1_path():
+    asn1 = os.path.abspath('..') + "/asn_j2735"
+    sys.path.append(asn1)
 
 def send(ip_send, port_send, msg, broadcast):
     sk_send = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -52,6 +54,7 @@ def writeLog():
 # yellow.off()
 # green.off()
 
+# Declarations
 print('Starting intersect.')
 ip_listen = '127.0.0.1'
 ip_send = '192.168.0.255'
@@ -67,7 +70,7 @@ countdown = None
 # fout = writeLog()
 
 msgIds=['0013'] # this can be updated to include other J2735 PSIDs
-print("Receiving Data")
+print("Waiting to receive data\n")
 def all():
     global updatingState
     while(1):
@@ -110,6 +113,9 @@ def all():
                     sleep(0.1)
 
 try:
+    add_asn1_path()
+    import J2735_201603_combined
+    
     t = Thread(target = all, args=(),  daemon = True) 
     t.start()
 except:

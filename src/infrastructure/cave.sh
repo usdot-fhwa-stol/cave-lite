@@ -1,6 +1,9 @@
 #!/bin/bash
 #!/usr/bin/env python3
 
+# exit on errors
+set -e
+
 directory=$(pwd)
 
 mkdir -p logs

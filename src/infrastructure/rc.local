@@ -23,7 +23,7 @@ cave_start()
     mkdir -p $DIR/logs
     chmod 777 $DIR/logs
 
-    bash $DIR/$script &
+    bash $DIR/$script
 }
 
 cave_stop()
