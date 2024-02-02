@@ -1,7 +1,12 @@
 #!/bin/bash
 #!/usr/bin/env python3
 
+# exit on errors
+set -e
+
 directory=$(pwd)
+
+mkdir -p logs
 
 intexit() {
     # Kill all subprocesses (all processes in the current process group)
@@ -24,7 +29,7 @@ extract() {
 }
 
 processing() {
-    extract # uncomment if different SPAT file will be used
+    extract # comment if same SPAT file will be used
     python3 $directory/tscScript.py &
     python3 $directory/trafficSignal.py &
 }
