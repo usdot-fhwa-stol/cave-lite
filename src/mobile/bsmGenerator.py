@@ -2,7 +2,6 @@
 from threading import Thread
 import sys, os
 import datetime
-import ast, json
 from time import sleep
 from binascii import hexlify
 from msgRecv import getLinSpeed
