@@ -1,54 +1,43 @@
 # SAE J2735 Message Sender
-import socket
-import signal, sys
+from threading import Thread
+import socket, sys
 import binascii as ba
 from time import sleep
-from bsmGenerator import encode
+import bsmGenerator
 
-def signal_handler(sig, frame):
-    print('Exiting')
-    sys.exit(0)
 
-ip_send = '192.168.0.255'
-broadcast = '255.255.255.255'
-port_send = 5005
-
-sk = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
-
-print('Press Ctrl+C to exit')
-
-# uncomment block to continually send single, non-generated BSM
-## read contents of 'bsm.txt' file
-# f = open('bsm.txt', 'r')
-# Lines = f.readlines()
-# f.close()
-
-print("Broadcasting messages.")
-while (1):
-    # uncomment block to send generated BSMs
-    data = str(encode)
-    data = data.strip('\n') # removes any new line characters
-    # print(data) # uncomment to view stream
-    # send Hex string to port
-    unhexed = ba.unhexlify(data)
+def send(ip_send, port_send, bsm, broadcast):
     sk_send = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sk_send.bind((ip_send, 0))
     sk_send.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1) # set broadcast
-    sk_send.sendto(unhexed, (broadcast, port_send)) # broadcast message
+    sk_send.sendto(bsm, (broadcast, port_send)) # broadcast message
     sk_send.close()
-    sleep(0.1) # 0.1 to send 10 BSMs/second, per SAE J2735
 
-    # uncomment block to send single, non-generated BSM
-    # for line in Lines:
-    #     data = line.strip('\n') # removes any new line characters
-    #     # print(data) # uncomment to view stream
-    #     # send Hex string to port
-    #     unhexed = ba.unhexlify(data)
-    #     sk_send = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    #     sk_send.bind((ip_send, 0))
-    #     sk_send.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1) # set broadcast
-    #     sk_send.sendto(unhexed, (broadcast, port_send)) # broadcast message
-    #     sk_send.close()
-    #     sleep(0.1) # 0.1 to send 10 BSMs/second, per SAE J2735
+def generate_bsm():
+    global unhexed
+    while(1):
+        data = bsmGenerator.encoded_bsm
+        unhexed = ba.unhexlify(data)
+        ## uncomment following line to print payload
+        # print(unhexed)
+        sleep(0.1)
+    
+def main():
+    # Declarations
+    ip_send = '192.168.0.255'
+    broadcast = '255.255.255.255'
+    port_send = 26789
 
-signal.signal(signal.SIGINT, signal_handler)
+    print("Broadcasting messages.")
+    print('Press Ctrl+C to exit.')
+
+    generateThread = Thread(target = generate_bsm, args=(),  daemon = True) 
+    generateThread.start()
+
+    while(1):
+        send(ip_send, port_send, unhexed, broadcast)
+        sleep(0.1)
+
+
+if __name__ == '__main__':
+  sys.exit(main())
