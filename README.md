@@ -12,8 +12,8 @@ Yellow state = 3 seconds
 Red state = Green + Yellow + 2 second all phases red (20 seconds)
 
 ## Prerequisites:
-* V2X Hub (arm64, latest) https://github.com/usdot-fhwa-OPS/V2X-Hub
-* V2X Hub installation instructions: https://usdot-carma.atlassian.net/wiki/spaces/V2XH/pages/1886158849/V2X-Hub+Docker+Deployment
+* V2X Hub (amd64/arm64, latest) https://github.com/usdot-fhwa-OPS/V2X-Hub
+* V2X Hub installation instructions: https://github.com/usdot-fhwa-stol/cave-lite/blob/develop/docs/CAVe-Lite_System_Design_Document.pdf
 
 
 ## Usage

@@ -1,5 +1,4 @@
 # BSM Generator
-from threading import Thread
 import socket, sys, os
 import binascii as ba
 import datetime
@@ -33,7 +32,6 @@ def getSecMark():
 def getSpeed():
     global speed
     speed = int(msgRecv.linSp*20)
-    print(speed)
     return speed
 
 def encode(bsmDict):
@@ -41,7 +39,6 @@ def encode(bsmDict):
     msgFrame.set_val(bsmDict)
     msgFrameUper = msgFrame.to_uper()
     encodedBSM = hexlify(msgFrameUper)
-    print(encodedBSM)
     return encodedBSM
 
 def main():
@@ -58,7 +55,7 @@ def main():
     print("Broadcasting messages.")
     print("Press Ctrl+C to exit.")
 
-    while(1):
+    while(msgRecv.complete != 1):
         msgCount = getMsgCount(msgCount)
         bsm['value'][1]['coreData']['msgCnt']  = msgCount
         bsm['value'][1]['coreData']['secMark'] = getSecMark()

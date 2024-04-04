@@ -6,19 +6,23 @@ The following prerequisites can be installed using the script found at scripts/i
 
 Prerequisites: 
 * python3
-* pip3
-* pycrate
 * gpiozero
 
 Mobile Kit Raspberry Pi default Static IP set to: 192.168.0.110
 
-1. Run mobile kit:
+1. Install dependencies:
+	```
+	cd ~/cave-lite/scripts
+	./install_dependencies.sh
+	```
+
+2. Run mobile kit:
 	```
 	cd ~/cave-mobile
 	bash mobile.sh
 	```
 	
-2. To stop script: 
+3. To stop script: 
 	```
 	<Ctrl+C>
 	```

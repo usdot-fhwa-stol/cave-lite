@@ -1,5 +1,4 @@
 ## Receive SPaT Messages and Manipulate Vehicle Motors
-
 import sys, os
 import socket
 import binascii
@@ -17,47 +16,25 @@ def signal_handler(sig, frame):
     print('\nExiting')
     sys.exit(0)  
 
-def getRPM():
+def getRPM(pwmMot):
     # rpm = int((pwmMot.value-0.083)/(1/240))
     rpm = int((pwmMot.value)/(1/240))
     print("Current RPM: ", rpm)
     return rpm
 
-def getAngVel():
-    w = getRPM() * (2*pi/60)
+def getAngVel(pwmMot):
+    w = getRPM(pwmMot) * (2*pi/60)
     return w
 
-def getLinSpeed():
+def getLinSpeed(wheelRad, pwmMot):
     global linSp
-    # linSp = getAngVel() * wheelRad
-    linSp = 2
+    linSp = getAngVel(pwmMot) * wheelRad
     print("Current Speed: ", round(linSp,2))
     return linSp
 
-def distToSig(timeEla):
-    dist = round(getLinSpeed() * timeEla, 2)
+def distToSig(timeEla, wheelRad, pwmMot):
+    dist = round(getLinSpeed(wheelRad, pwmMot) * timeEla, 2)
     return dist
-
-# Motor Declarations
-motorSTBY = DigitalOutputDevice(17)
-motorA = DigitalOutputDevice(27)
-motorB = DigitalOutputDevice(22)
-pwmMot = PWMOutputDevice(18)    # pwm pin to control speed
-motorSTBY.off()  # initialize motor driver
-motorA.on()     # initialize motorA to on for forward direction
-motorB.off()    # initialize motorB to off for forward direction
-
-# Initial Declarations
-# inFeet = int(input("Enter distance to signal in feet: "))
-totDistance = 25/3.281    # received distance to signal in m
-wheelRad = 0.0365   # radius of wheels in m
-# wheelCir = 2*pi*wheelRad    # wheel circumference in m
-c1tDist = round(totDistance, 2)   # init dist to signal
-timeEla = 0    #initiate time for dist travelled
-counter = 0
-linSp = 0
-distTravelled = 0
-complete = 0
 
 # listen to broadcast at declared IP + Port
 ip_listen = "255.255.255.255"
@@ -65,12 +42,36 @@ port_listen = 5005
 sk_listen = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # declare receiving UDP connection
 sk_listen.bind((ip_listen, port_listen))
 
+# Early declaration
+linSp = 0
+complete = 0
 
-msgIds=['0013'] # this can be updated to include other J2735 PSIDs
-print("Total distance to signal (in meters): ", c1tDist)
-print("Vehicle listening.")
-sleep(1)
 def all():
+    # Motor Declarations
+    motorSTBY = DigitalOutputDevice(17)
+    motorA = DigitalOutputDevice(27)
+    motorB = DigitalOutputDevice(22)
+    pwmMot = PWMOutputDevice(18)    # pwm pin to control speed
+    motorSTBY.off()  # initialize motor driver
+    motorA.on()      # initialize motorA to on for forward direction
+    motorB.off()     # initialize motorB to off for forward direction
+
+    # Initial Declarations
+    distToTravel = 50                      # declare distance to travel, in feet
+    totDistance = distToTravel/3.281       # received distance to signal in m
+    wheelRad = 0.0365                # radius of wheels in m
+    # wheelCir = 2*pi*wheelRad     # wheel circumference in m
+    c1tDist = round(totDistance, 2)  # init dist to signal
+    timeEla = 0                      #initiate time for dist travelled
+    counter = 0
+    distTravelled = 0
+
+    global complete
+
+    msgIds=['0013'] # this can be updated to include other J2735 PSIDs
+    print("Total distance to signal (in meters): ", c1tDist)
+    print("Vehicle listening.")
+    sleep(1)
     while(complete != 1):
         data = str(sk_listen.recvfrom(10000)[0])
         data = ''.join(data.split())
@@ -176,16 +177,17 @@ def all():
                         print('Phase: ' + phaseTwoState)
                         print('  State: ' + str(phaseTwo))
                         # print("Time elapsed: ", round(timeEla,2))
-                        distTravelled = distTravelled + distToSig(timeEla)
+                        distTravelled = distTravelled + distToSig(timeEla, wheelRad, pwmMot)
                         print("Distance Travelled: ", round(distTravelled,2))
-                        c1tDist = round(totDistance - distTravelled)
-                        print("C1T distance to signal: ", round(c1tDist,2))
+                        c1tDist = totDistance - distTravelled
+                        print("Vehicle distance to signal: ", round(c1tDist,2))
 
                     else:
                         pwmMot.off()
                         motorA.off()
                         motorSTBY.off()
                         complete = 1
+                        print("Vehicle destination reached.")
                     break
 
 
