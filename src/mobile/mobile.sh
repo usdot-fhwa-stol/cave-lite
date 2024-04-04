@@ -18,9 +18,9 @@ hupexit() {
 }
 
 processing() {
-    read -p "Enter distance to signal in feet: " distance
-    python3 $directory/msgRecv.py $distance &
-    python3 $directory/bsmSend.py &
+    # read -p "Enter distance to signal in feet: " distance
+    # python3 $directory/msgRecv.py $distance &
+    python3 $directory/bsmGenerator.py &
 }
 
 trap hupexit HUP
