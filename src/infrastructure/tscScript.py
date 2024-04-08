@@ -1,6 +1,5 @@
 # Send NTCIP 1202 using UDP
-import socket
-import signal, sys
+import socket, sys
 from binascii import unhexlify
 from time import sleep
 

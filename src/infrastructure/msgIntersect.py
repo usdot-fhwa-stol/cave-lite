@@ -1,9 +1,7 @@
 ## Receive, Decode, Broadcast SAE J2735 Messages
 
-import os
-import os.path
-import sys
-import socket
+import os, os.path
+import sys, socket
 import binascii
 import datetime
 from time import sleep
