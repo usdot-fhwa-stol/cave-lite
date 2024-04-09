@@ -13,16 +13,16 @@ Mobile Kit Raspberry Pi default Static IP set to: 192.168.0.110
 1. Install dependencies:
 	```
 	cd ~/cave-lite/scripts
-	./install_dependencies.sh
+	sudo ./install_dependencies.sh
 	```
 
 2. Run mobile kit:
 	```
-	cd ~/cave-mobile
+	cd ~/cave-lite/src/mobile
 	bash mobile.sh
 	```
 	
 3. To stop script: 
 	```
-	<Ctrl+C>
+	<Ctrl-C>
 	```
