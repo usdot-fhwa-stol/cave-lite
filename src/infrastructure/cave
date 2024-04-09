@@ -37,6 +37,47 @@ processing() {
 trap hupexit HUP
 trap intexit INT
 
-processing
+cave_start()
+{
+    # Ensure logs directory exists and is writable
+    mkdir -p $DIR/logs
+    chmod 777 $DIR/logs
+
+    processing
+}
+
+cave_stop()
+{
+    pkill -f cave.sh & pkill -f msgIntersect.py & pkill -f tscScript.py
+}
+
+cave_echo()
+{
+    cd $DIR/logs/
+    latest_log=$(ls -t *.log | head -1)
+    tail -f $latest_log
+}
+
 
 wait
+
+mode=$1
+echo "$0 is called with parameter: '$mode'"
+
+case $mode in
+    "start")
+        cave_start
+        ;;
+    "stop")
+        cave_stop
+        ;;
+    "restart")
+        cave_stop
+        cave_start
+        ;;
+    "echo")
+        cave_echo
+        ;;
+    *)
+        ;;
+esac
