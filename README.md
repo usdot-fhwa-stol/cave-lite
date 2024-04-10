@@ -28,12 +28,12 @@ CAVe-Lite Raspberry Pi default Static IP set to: 192.168.0.146
 2. To run:
 	```
 	cd ~/cave-lite/src/infrastructure
-	./rc.local start
+	sudo ./cave start
 	```
 
 3. To stop:
 	```
-	./rc.local stop
+	sudo ./cave stop
 	```
 
 ## License information
