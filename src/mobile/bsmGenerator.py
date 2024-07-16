@@ -4,7 +4,7 @@ import sys, os
 import datetime
 from time import sleep
 from binascii import hexlify
-from msgRecv import getLinSpeed
+import msgRecv
 
 def add_asn1_path():
     asn1 = os.path.abspath('..') + "/asn_j2735"
@@ -23,7 +23,7 @@ def getSecMark():
     return int(secMark)
 
 def getSpeed():
-    speed = int(getLinSpeed()*20)
+    speed = int(msgRecv.getLinSpeed()*20)
     return speed
 
 def encode(bsmDict):

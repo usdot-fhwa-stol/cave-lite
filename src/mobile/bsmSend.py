@@ -18,7 +18,7 @@ def generate_bsm():
     while(1):
         data = bsmGenerator.encoded_bsm
         unhexed = ba.unhexlify(data)
-        ## uncomment following line to print payload
+        # uncomment following line to print payload
         # print(unhexed)
         sleep(0.1)
     
@@ -33,6 +33,7 @@ def main():
 
     generateThread = Thread(target = generate_bsm, args=(),  daemon = True) 
     generateThread.start()
+    print("Generate BSM Thread Started.")
 
     while(1):
         send(ip_send, port_send, unhexed, broadcast)
