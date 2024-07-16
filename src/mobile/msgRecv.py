@@ -17,23 +17,24 @@ def signal_handler(sig, frame):
     print('\nExiting')
     sys.exit(0)  
 
-def getRPM():
+def getRPM(pwmMot):
     # rpm = int((pwmMot.value-0.083)/(1/240))
     rpm = int((pwmMot.value)/(1/240))
     print("Current RPM: ", rpm)
     return rpm
 
-def getAngVel():
-    w = getRPM() * (2*pi/60)
+def getAngVel(pwmMot):
+    w = getRPM(pwmMot) * (2*pi/60)
     return w
 
-def getLinSpeed():
-    linSp = getAngVel() * wheelRad
+def getLinSpeed(wheelRad, pwmMot):
+    global linSp
+    linSp = getAngVel(pwmMot) * wheelRad
     print("Current Speed: ", round(linSp,2))
     return linSp
 
-def distToSig(timeEla):
-    dist = round(getLinSpeed() * timeEla, 2)
+def distToSig(timeEla, wheelRad, pwmMot):
+    dist = round(getLinSpeed(wheelRad, pwmMot) * timeEla, 2)
     return dist
 
 
@@ -62,7 +63,6 @@ ip_listen = "255.255.255.255"
 port_listen = 5005
 sk_listen = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # declare receiving UDP connection
 sk_listen.bind((ip_listen, port_listen))
-
 
 msgIds=['0013'] # this can be updated to include other J2735 PSIDs
 print("Total distance to signal (in meters): ", c1tDist)

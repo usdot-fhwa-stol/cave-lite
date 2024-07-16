@@ -12,8 +12,8 @@ Yellow state = 3 seconds
 Red state = Green + Yellow + 2 second all phases red (20 seconds)
 
 ## Prerequisites:
-* V2X Hub (arm64, latest) https://github.com/usdot-fhwa-OPS/V2X-Hub
-* V2X Hub installation instructions: https://usdot-carma.atlassian.net/wiki/spaces/V2XH/pages/1886158849/V2X-Hub+Docker+Deployment
+* V2X Hub (latest) https://github.com/usdot-fhwa-OPS/V2X-Hub
+* V2X Hub installation instructions: https://github.com/usdot-fhwa-OPS/V2X-Hub/tree/develop/configuration 
 
 
 ## Usage
@@ -28,12 +28,12 @@ CAVe-Lite Raspberry Pi default Static IP set to: 192.168.0.146
 2. To run:
 	```
 	cd ~/cave-lite/src/infrastructure
-	./rc.local start
+	sudo ./cave start
 	```
 
 3. To stop:
 	```
-	./rc.local stop
+	sudo ./cave stop
 	```
 
 ## License information

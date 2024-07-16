@@ -18,7 +18,7 @@ def generate_bsm():
     while(1):
         data = bsmGenerator.encoded_bsm
         unhexed = ba.unhexlify(data)
-        # uncomment following line to print payload
+        ## uncomment following line to print payload
         # print(unhexed)
         sleep(0.1)
     
