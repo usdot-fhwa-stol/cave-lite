@@ -99,11 +99,11 @@ def all():
                             writeState(currentState)
                             writePhase(currentPhase)
                             timeEndSec = minEndTime/6
-                            print("timeEndSec: ", timeEndSec*6)
+                            # print("timeEndSec: ", timeEndSec*6)
                             updatingState = currentState
                         elif (currentPhase == 22) :
                             timeEndMilliSec = minEndTime/6
-                            print("timeEndMilliSec: ", timeEndMilliSec*6)
+                            # print("timeEndMilliSec: ", timeEndMilliSec*6)
                     writeTime(timeEndSec, timeEndMilliSec)
 
                     ## send
