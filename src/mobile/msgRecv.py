@@ -37,15 +37,6 @@ def distToSig(timeEla, wheelRad, pwmMot):
     return dist
 
 
-# Motor Declarations
-motorSTBY = DigitalOutputDevice(17)
-motorA = DigitalOutputDevice(27)
-motorB = DigitalOutputDevice(22)
-pwmMot = PWMOutputDevice(18)    # pwm pin to control speed
-motorSTBY.off()  # initialize motor driver
-motorA.on()      # initialize motorA to on for forward direction
-motorB.off()     # initialize motorB to off for forward direction
-
 # Listen to broadcast at declared IP + Port
 ip_listen = "255.255.255.255"
 port_listen = 5005
@@ -56,6 +47,15 @@ def all():
     # Global Declarations
     global complete
     global linSp
+
+    # Motor Declarations
+    motorSTBY = DigitalOutputDevice(17)
+    motorA = DigitalOutputDevice(27)
+    motorB = DigitalOutputDevice(22)
+    pwmMot = PWMOutputDevice(18)    # pwm pin to control speed
+    motorSTBY.off()  # initialize motor driver
+    motorA.on()      # initialize motorA to on for forward direction
+    motorB.off()     # initialize motorB to off for forward direction
 
     # Initial Declarations
     dist = int(sys.argv[1])
@@ -124,7 +124,7 @@ def all():
                         else: 
                             motorSTBY.on()
                             motorA.on()
-                            pwmMot.value = 0.7
+                            pwmMot.value = 0.4
                             timeEla = timeEla + (time() - lastStopped)
                         
                         print('Phase: ', phaseTwoState)
@@ -152,5 +152,3 @@ try:
     t.start()
 except:
     print("Starting thread did not work")
-    pwmMot.off()
-    motorSTBY.off()
