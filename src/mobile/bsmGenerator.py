@@ -23,7 +23,8 @@ def getSecMark():
     return int(secMark)
 
 def getSpeed():
-    speed = int(msgRecv.linSp*20)
+    with msgRecv.linSp_lock:  # Ensure thread-safety
+        speed = int(msgRecv.linSp * 20)
     return speed
 
 def encode(bsmDict):
@@ -33,13 +34,17 @@ def encode(bsmDict):
     encodedBSM = hexlify(msgFrameUper)
     return encodedBSM
 
+encoded_bsm = None  # Initialize the global variable
+
 def all():
+    # Global Declaration
+    global encoded_bsm
+
     # Continually update values in dict and encode:
     bsm = {'messageId': 20, 'value': ('BasicSafetyMessage', {'coreData': {'msgCnt': 18, 'id': b'g\xc9_l', 'secMark': 28782, 'lat': 389548850, 'long': -771483730, 'elev': 394, 'accuracy': {'semiMajor': 255, 'semiMinor': 255, 'orientation': 65535}, 'transmission': 'forwardGears', 'speed': 234, 'heading': 28800, 'angle': 127, 'accelSet': {'long': 2001, 'lat': 2001, 'vert': -127, 'yaw': 32767}, 'brakes': {'wheelBrakes': (0, 5), 'traction': 'unavailable', 'abs': 'unavailable', 'scs': 'unavailable', 'brakeBoost': 'unavailable', 'auxBrakes': 'unavailable'}, 'size': {'width': 0, 'length': 0}}})}
     msgCount = 0
-    global encoded_bsm
 
-    while(1):
+    while True:
         msgCount = getMsgCount(msgCount)
         bsm['value'][1]['coreData']['msgCnt']  = msgCount
         bsm['value'][1]['coreData']['secMark'] = getSecMark()
@@ -54,5 +59,5 @@ try:
     
     t = Thread(target = all, args=(),  daemon = True) 
     t.start()
-except:
-    print("Starting thread did not work")
+except Exception as e:
+    print(f"Starting thread did not work: {e}")
