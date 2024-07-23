@@ -31,7 +31,7 @@ def writeTime(endTime, currentSec, currentDecSec):
     global countdown
     currentTime = currentSec + currentDecSec / 10.0
     countdown = round(endTime - currentTime, 2)
-    # fout.writelines(["Time to next state: {:.2f}".format(countdown)])
+    # fout.writelines(["Time to next state: {:.1f}".format(countdown)])
     print("Time to next state: {:.1f}".format(countdown))
 
 def writeLog():

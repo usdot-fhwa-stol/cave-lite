@@ -5,7 +5,7 @@ import socket
 import binascii
 from gpiozero import DigitalOutputDevice, PWMOutputDevice
 from math import pi
-from time import sleep, time
+import time
 from threading import Thread, Lock
 
 linSp = 0  # Initialize linSp at the module level
@@ -35,6 +35,11 @@ def distToSig(timeEla, wheelRad, pwmVal):
     dist = round(getLinSpeed(wheelRad, pwmVal) * timeEla, 2)
     return dist
 
+def countdown(endTime, currentSec, currentDecSec):
+    currentTime = currentSec + currentDecSec / 10.0
+    countdown = round(endTime - currentTime, 2)
+    print("Time to next state: {:.1f}".format(countdown))
+
 def all():
     # Global Declarations
     global complete
@@ -56,7 +61,6 @@ def all():
     timeEla = 0    # initiate time for dist travelled
     distTravelled = 0
     complete = 0
-    lastStopped = time()  # Initialize lastStopped to the current time
 
     # Listen to broadcast at declared IP + Port
     ip_listen = "255.255.255.255"
@@ -66,9 +70,8 @@ def all():
 
     msgIds=['0013'] # this can be updated to include other J2735 PSIDs
     print("Total distance to signal (in meters): ", c1tDist)
-    sleep(1)
     print("Vehicle listening.")
-    sleep(1)
+    time.sleep(1)
 
     while(complete != 1):
         data = str(sk_listen.recvfrom(10000)[0])
@@ -93,7 +96,11 @@ def all():
                     # print(decodedStr, '\n')
 
                     instersectionPhaseArray = decode()['value'][1]['intersections'][0]['states']
-                    # print("Length instersectionPhaseArray: " + str(len(instersectionPhaseArray)))
+                    utcTime = time.gmtime()
+                    utcMin = utcTime.tm_min
+                    utcSec = utcTime.tm_sec
+                    utcDeci = int((time.time()%1) * 10)
+                    currentSec = utcMin*60 + utcSec
                     for phase in range(len(instersectionPhaseArray)):
                         currentPhase = decode()['value'][1]['intersections'][0]['states'][phase].get('signalGroup')
                         currentState = str(decode()['value'][1]['intersections'][0]['states'][phase]['state-time-speed'][0]['eventState'])
@@ -101,30 +108,26 @@ def all():
                         if (currentPhase == 2):
                             phaseTwo = currentPhase
                             phaseTwoState = currentState
-                            timeEndTwo = minEndTime/600
-                        elif (currentPhase == 22):
-                            timeEndDouble = minEndTime/600
-                    countdown = (timeEndTwo-timeEndDouble)*100
-                    print("Time to next state: ", round(countdown,1))
+                            timeEndTwo = minEndTime/10
+                    countdown(timeEndTwo, currentSec, utcDeci)
 
                     if (c1tDist > 0):
-                        if (phaseTwoState == "stop-And-Remain" and countdown > 0.5):
+                        if (phaseTwoState == "stop-And-Remain"):
                             pwmMot.off()
                             pwmVal = 0
                             motorSTBY.off()
                             motorA.off()
                             timeEla = 0
-                            lastStopped = time()
                         else: 
                             motorSTBY.on()
                             motorA.on()
                             pwmMot.value = 0.3
                             pwmVal = 0.3
-                            timeEla = timeEla + (time() - lastStopped)
-                        
+                            timeEla += (time.process_time_ns() * 10**-9)
+
                         print('Phase: ', phaseTwoState)
                         print('  State: ', phaseTwo)
-                        print("Time elapsed: ", round(timeEla, 2))
+                        print("Time elapsed: ", timeEla)
                         distTravelled = distTravelled + distToSig(timeEla, wheelRad, pwmVal)
                         print("Distance Travelled: ", round(distTravelled, 2))
                         c1tDist = round(totDistance - distTravelled)
@@ -142,7 +145,7 @@ def all():
 try:
     add_asn1_path()
     import J2735_201603_combined
-    
+
     t = Thread(target = all, args=(),  daemon = True) 
     t.start()
 except Exception as e:
