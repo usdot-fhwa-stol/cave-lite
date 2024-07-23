@@ -4,7 +4,7 @@ import os, os.path
 import sys, socket
 import binascii
 import datetime
-from time import sleep
+import time
 from threading import Thread
 # from gpiozero import LED  # uncomment if physical digital signal head will be used
 
@@ -27,11 +27,12 @@ def writeState(state):
     # fout.writelines([str(state),  "\n"])
     print(str(state),  "\n")
 
-def writeTime(seconds, millisec):
+def writeTime(endTime, currentSec, currentDecSec):
     global countdown
-    countdown = round(seconds-millisec, 1)
-    # fout.writelines(["Time to next state: ", str(countdown), "\n"])
-    print("Time to next state: ", str(countdown), "\n")
+    currentTime = currentSec + currentDecSec / 10.0
+    countdown = round(endTime - currentTime, 2)
+    # fout.writelines(["Time to next state: {:.2f}".format(countdown)])
+    print("Time to next state: {:.1f}".format(countdown))
 
 def writeLog():
     path = os.getcwd() + "/logs/"
@@ -89,26 +90,28 @@ def all():
                     msg = data[idx:idx+lenstr].encode('utf-8')
                     decode = J2735_201603_combined.DSRC.MessageFrame
                     decode.from_uper(binascii.unhexlify(msg))
+                    # print(decode())
 
                     instersectionPhaseArray = decode()['value'][1]['intersections'][0]['states']
+                    utcTime = time.gmtime()
+                    utcMin = utcTime.tm_min
+                    utcSec = utcTime.tm_sec
+                    utcDeci = int((time.time()%1) * 10)
+                    currentSec = utcMin*60 + utcSec
                     for phase in range(len(instersectionPhaseArray)):
                         currentPhase = decode()['value'][1]['intersections'][0]['states'][phase].get('signalGroup')
                         currentState = str(decode()['value'][1]['intersections'][0]['states'][phase]['state-time-speed'][0]['eventState'])
                         minEndTime = decode()['value'][1]['intersections'][0]['states'][phase]['state-time-speed'][0]['timing']['minEndTime']
-                        if (currentPhase == 2) : # additional phases may be included as the same if-statements
+                        if (currentPhase == 4) : # additional phases may be included as the same if-statements
                             writeState(currentState)
                             writePhase(currentPhase)
-                            timeEndSec = minEndTime/6
+                            timeEndSec = minEndTime/10
                             # print("timeEndSec: ", timeEndSec*6)
                             updatingState = currentState
-                        elif (currentPhase == 22) :
-                            timeEndMilliSec = minEndTime/6
-                            # print("timeEndMilliSec: ", timeEndMilliSec*6)
-                    writeTime(timeEndSec, timeEndMilliSec)
+                    writeTime(timeEndSec, currentSec, utcDeci)
 
                     ## send
                     send(ip_send, port_send, msg, broadcast)
-                    sleep(0.1)
 
 try:
     add_asn1_path()

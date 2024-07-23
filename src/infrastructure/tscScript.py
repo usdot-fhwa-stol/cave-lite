@@ -15,7 +15,7 @@ def main():
     f.close()
 
     print('Sending.\nPress Ctrl+C to exit')
-    sleep(2)
+    sleep(1)
     while(1):
         for line in Lines:
             data = line.strip('\n')
