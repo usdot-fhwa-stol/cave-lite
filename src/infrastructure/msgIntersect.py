@@ -102,7 +102,7 @@ def all():
                         currentPhase = decode()['value'][1]['intersections'][0]['states'][phase].get('signalGroup')
                         currentState = str(decode()['value'][1]['intersections'][0]['states'][phase]['state-time-speed'][0]['eventState'])
                         minEndTime = decode()['value'][1]['intersections'][0]['states'][phase]['state-time-speed'][0]['timing']['minEndTime']
-                        if (currentPhase == 4) : # additional phases may be included as the same if-statements
+                        if (currentPhase == 2) : # additional phases may be included as the same if-statements
                             writeState(currentState)
                             writePhase(currentPhase)
                             timeEndSec = minEndTime/10
