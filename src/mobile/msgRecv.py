@@ -61,6 +61,7 @@ def all():
     timeEla = 0    # initiate time for dist travelled
     distTravelled = 0
     complete = 0
+    lastTime = time.time()
 
     # Listen to broadcast at declared IP + Port
     ip_listen = "255.255.255.255"
@@ -118,16 +119,17 @@ def all():
                             motorSTBY.off()
                             motorA.off()
                             timeEla = 0
+                            lastTime = time.time()
                         else: 
                             motorSTBY.on()
                             motorA.on()
                             pwmMot.value = 0.3
                             pwmVal = 0.3
-                            timeEla += (time.process_time_ns() * 10**-9)
+                            timeEla = time.time() - lastTime
 
                         print('Phase: ', phaseTwoState)
                         print('  State: ', phaseTwo)
-                        print("Time elapsed: ", timeEla)
+                        print("Time elapsed: ", round(timeEla, 2))
                         distTravelled = distTravelled + distToSig(timeEla, wheelRad, pwmVal)
                         print("Distance Travelled: ", round(distTravelled, 2))
                         c1tDist = round(totDistance - distTravelled)
