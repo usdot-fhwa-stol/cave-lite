@@ -26,5 +26,6 @@ if [[ $distro = "Debian" ]]; then
     cd ../
     rm -rf pycrate-0.7.2 pycrate-0.7.2.tar.gz
 else 
+    apt-get -y install python3-pip
     pip3 install pycrate
 fi
