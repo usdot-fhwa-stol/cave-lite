@@ -1,6 +1,6 @@
-from tkinter import *
+from tkinter import Tk, Canvas
 from tkinter import font
-import msgIntersect
+from msgIntersect import get_updating_state, get_countdown
 import sys
 
 class TrafficSignal:
@@ -50,8 +50,8 @@ class Signal:
 
 def get_state():
     global current_state, countdown
-    current_state = msgIntersect.updatingState
-    countdown = msgIntersect.countdown
+    current_state = get_updating_state()
+    countdown = get_countdown()
 
 def update():
     get_state()

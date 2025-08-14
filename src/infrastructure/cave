@@ -41,14 +41,14 @@ cave_start()
 {
     # Ensure logs directory exists and is writable
     mkdir -p $DIR/logs
-    chmod 777 $DIR/logs
+    sudo chmod 777 $DIR/logs
 
     processing
 }
 
 cave_stop()
 {
-    pkill -f cave.sh & pkill -f msgIntersect.py & pkill -f tscScript.py
+    pkill -f msgIntersect.py & pkill -f tscScript.py
 }
 
 cave_echo()
