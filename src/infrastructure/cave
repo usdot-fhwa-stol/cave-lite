@@ -5,6 +5,7 @@
 set -e
 
 directory=$(pwd)
+source "$directory/../../.venv/bin/activate"
 
 mkdir -p logs
 
