@@ -5,18 +5,7 @@ import datetime
 import time
 from binascii import unhexlify
 from threading import Thread, Event
-from pathlib import Path
-
-# Specify the project root and asn file path
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
-ASN_PATH = PROJECT_ROOT / "asn_j2735"
-
-try:
-    sys.path.append(ASN_PATH.as_posix())
-    import J2735_202409
-except ImportError as e:
-    print("Error importing ASN.1 modules:", e)
-    sys.exit(1)
+import j2735_202409
 
 ## Uncomment below if physical digital signal head will be used
 # from gpiozero import LED
@@ -64,7 +53,7 @@ class MessageIntersect:
     def __init__(self,
                  ip_listen: str = IP_LISTEN, port_listen: int = PORT_LISTEN,
                  ip_send: str = IP_SEND, port_send: int = PORT_SEND,
-                 broadcast: str = BROADCAST, message_frame = J2735_202409):
+                 broadcast: str = BROADCAST, message_frame = j2735_202409):
         
         self.ip_listen = ip_listen
         self.port_listen = port_listen

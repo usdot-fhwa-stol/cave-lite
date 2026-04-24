@@ -1,6 +1,6 @@
 ## Receive SPaT Messages and Manipulate Vehicle Motors
 
-import sys, os
+import sys
 import socket
 import binascii
 from gpiozero import DigitalOutputDevice, PWMOutputDevice
@@ -8,12 +8,10 @@ from math import pi
 import time
 from threading import Thread, Lock
 
+import j2735_202409
+
 linSp = 0  # Initialize linSp at the module level
 linSp_lock = Lock()  # A lock to ensure thread-safety when updating linSp
-
-def add_asn1_path():
-    asn1 = os.path.abspath('..') + "/asn_j2735"
-    sys.path.append(asn1)
 
 def getRPM(pwmVal):
     rpm = int((pwmVal)/(1/240))
@@ -91,7 +89,7 @@ def all():
                 if (lenstr <= len(data)-idx+1):
                     ## decode
                     msg = data[idx:idx+lenstr].encode('utf-8')
-                    decode = J2735_201603_combined.DSRC.MessageFrame
+                    decode = j2735_202409.MessageFrame.MessageFrame
                     decode.from_uper(binascii.unhexlify(msg))
                     # decodedStr = str(decode())
                     # print(decodedStr, '\n')
@@ -145,10 +143,7 @@ def all():
 
 
 try:
-    add_asn1_path()
-    import J2735_201603_combined
-
-    t = Thread(target = all, args=(),  daemon = True) 
+    t = Thread(target = all, args=(),  daemon = True)
     t.start()
 except Exception as e:
     print(f"Starting thread did not work: {e}")
