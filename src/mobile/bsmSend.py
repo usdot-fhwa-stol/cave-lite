@@ -1,9 +1,11 @@
 # SAE J2735 Message Sender
 from threading import Thread
+import signal
 import socket
 import binascii as ba
 from time import sleep
 import bsmGenerator
+import msgRecv
 
 def send(ip_send, port_send, bsm, broadcast):
     try:
@@ -35,11 +37,17 @@ def generate_bsm():
     except Exception as e:
         print(f"Error in generate_bsm function: {e}")
 
+def shutdown(signum=None, frame=None):
+    print("\nExiting.")
+    msgRecv.cleanup()
+
 def main():
     print("Broadcasting messages.")
     print('Press Ctrl+C to exit.')
 
-    generateThread = Thread(target=generate_bsm, daemon=True) 
+    signal.signal(signal.SIGTERM, lambda *_: shutdown())
+
+    generateThread = Thread(target=generate_bsm, daemon=True)
     generateThread.start()
     print("Generate BSM Thread Started.")
 
@@ -48,7 +56,9 @@ def main():
         while True:
             sleep(1)
     except KeyboardInterrupt:
-        print("Exiting.")
+        pass
+    finally:
+        shutdown()
 
 if __name__ == '__main__':
     main()

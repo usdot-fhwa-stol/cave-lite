@@ -60,8 +60,6 @@ cave_echo()
 }
 
 
-wait
-
 mode=$1
 echo "$0 is called with parameter: '$mode'"
 
@@ -82,3 +80,6 @@ case $mode in
     *)
         ;;
 esac
+
+# Block on the backgrounded python scripts so SIGINT reaches the trap
+wait

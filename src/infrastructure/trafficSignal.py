@@ -1,6 +1,7 @@
 from tkinter import Tk, Canvas
 from tkinter import font
-from msgIntersect import get_updating_state, get_countdown
+from msgIntersect import get_updating_state, get_countdown, stop_intersect
+import signal
 import sys
 
 class TrafficSignal:
@@ -65,13 +66,28 @@ def update():
         state.update_signal("", "")
     top.after(100, update)
 
+def shutdown(signum=None, frame=None):
+    print('\nStopping trafficSignal.')
+    stop_intersect()
+    try:
+        top.quit()
+        top.destroy()
+    except Exception:
+        pass
+
 def main():
     global top, state
     print("Starting Traffic Signal\n")
     top = Tk()
     state = Signal(top)
+    top.protocol("WM_DELETE_WINDOW", shutdown)
+    signal.signal(signal.SIGINT, shutdown)
+    signal.signal(signal.SIGTERM, shutdown)
     top.after(100, update)
-    top.mainloop()
+    try:
+        top.mainloop()
+    except KeyboardInterrupt:
+        shutdown()
 
 if __name__ == '__main__':
     sys.exit(main())

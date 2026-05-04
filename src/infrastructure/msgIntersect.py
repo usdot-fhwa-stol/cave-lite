@@ -190,6 +190,7 @@ class MessageIntersect:
 
 
 # Run the intersect in a background thread
+intersect = None
 try:
     intersect = MessageIntersect()
     intersect.start()
@@ -205,3 +206,32 @@ def get_updating_state():
 def get_countdown():
     """Return the latest countdown."""
     return MessageIntersect.countdown
+
+
+def stop_intersect(timeout=2):
+    """Stop the background MessageIntersect thread and close its sockets."""
+    global intersect
+    if intersect is not None:
+        try:
+            intersect.stop(timeout=timeout)
+        except Exception:
+            pass
+
+
+if __name__ == "__main__":
+    import signal
+
+    def _shutdown(signum=None, frame=None):
+        print('\nStopping msgIntersect.')
+        stop_intersect()
+        sys.exit(0)
+
+    signal.signal(signal.SIGINT, _shutdown)
+    signal.signal(signal.SIGTERM, _shutdown)
+
+    # Keep the main thread alive so the daemon thread can run
+    try:
+        while intersect is not None and intersect._thread.is_alive():
+            time.sleep(0.5)
+    except KeyboardInterrupt:
+        _shutdown()

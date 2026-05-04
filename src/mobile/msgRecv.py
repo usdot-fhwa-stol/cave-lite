@@ -13,6 +13,32 @@ import j2735_202409
 linSp = 0  # Initialize linSp at the module level
 linSp_lock = Lock()  # A lock to ensure thread-safety when updating linSp
 
+# Holders for motor and socket references so cleanup can reach them from
+# outside the worker thread. Populated by all() after hardware is claimed.
+_resources = {
+    'pwmMot': None,
+    'motorSTBY': None,
+    'motorA': None,
+    'motorB': None,
+    'sk_listen': None,
+}
+
+def cleanup():
+    """Turn off motors and close the receive socket. Safe to call repeatedly."""
+    for key in ('pwmMot', 'motorSTBY', 'motorA', 'motorB'):
+        device = _resources.get(key)
+        if device is not None:
+            try:
+                device.off()
+            except Exception:
+                pass
+    sk = _resources.get('sk_listen')
+    if sk is not None:
+        try:
+            sk.close()
+        except Exception:
+            pass
+
 def getRPM(pwmVal):
     rpm = int((pwmVal)/(1/240))
     print("Current RPM: ", rpm)
@@ -47,6 +73,10 @@ def all():
     motorA = DigitalOutputDevice(27)
     motorB = DigitalOutputDevice(22)
     pwmMot = PWMOutputDevice(18)    # pwm pin to control speed
+    _resources['motorSTBY'] = motorSTBY
+    _resources['motorA'] = motorA
+    _resources['motorB'] = motorB
+    _resources['pwmMot'] = pwmMot
     motorSTBY.off()  # initialize motor driver
     motorA.on()      # initialize motorA to on for forward direction
     motorB.off()     # initialize motorB to off for forward direction
@@ -66,6 +96,7 @@ def all():
     port_listen = 5005
     sk_listen = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # declare receiving UDP connection
     sk_listen.bind((ip_listen, port_listen))
+    _resources['sk_listen'] = sk_listen
 
     msgIds=['0013'] # this can be updated to include other J2735 PSIDs
     print("Total distance to signal (in meters): ", c1tDist)
@@ -73,7 +104,11 @@ def all():
     time.sleep(1)
 
     while(complete != 1):
-        data = str(sk_listen.recvfrom(10000)[0])
+        try:
+            data = str(sk_listen.recvfrom(10000)[0])
+        except OSError:
+            # Socket was closed by cleanup(); exit the loop quietly.
+            break
         data = ''.join(data.split())
         # print(data)
         for id in msgIds:
