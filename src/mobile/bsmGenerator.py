@@ -1,14 +1,10 @@
 # BSM Generator
 from threading import Thread
-import sys, os
 import datetime
 from time import sleep
 from binascii import hexlify
 import msgRecv
-
-def add_asn1_path():
-    asn1 = os.path.abspath('..') + "/asn_j2735"
-    sys.path.append(asn1)
+import j2735_202409
 
 def getMsgCount(msgCount):
     msgCount += 1
@@ -28,7 +24,7 @@ def getSpeed():
     return speed
 
 def encode(bsmDict):
-    msgFrame = J2735_201603_combined.DSRC.MessageFrame
+    msgFrame = j2735_202409.MessageFrame.MessageFrame
     msgFrame.set_val(bsmDict)
     msgFrameUper = msgFrame.to_uper()
     encodedBSM = hexlify(msgFrameUper)
@@ -54,10 +50,7 @@ def all():
         sleep(0.1) # sleep to generate a new BSM every 0.1 seconds
 
 try:
-    add_asn1_path()
-    import J2735_201603_combined
-    
-    t = Thread(target = all, args=(),  daemon = True) 
+    t = Thread(target = all, args=(),  daemon = True)
     t.start()
 except Exception as e:
     print(f"Starting thread did not work: {e}")

@@ -5,6 +5,7 @@
 set -e
 
 directory=$(pwd)
+source "$directory/../../.venv/bin/activate"
 
 mkdir -p logs
 
@@ -41,14 +42,14 @@ cave_start()
 {
     # Ensure logs directory exists and is writable
     mkdir -p $DIR/logs
-    chmod 777 $DIR/logs
+    sudo chmod 777 $DIR/logs
 
     processing
 }
 
 cave_stop()
 {
-    pkill -f cave.sh & pkill -f msgIntersect.py & pkill -f tscScript.py
+    pkill -f msgIntersect.py & pkill -f tscScript.py
 }
 
 cave_echo()
@@ -58,8 +59,6 @@ cave_echo()
     tail -f $latest_log
 }
 
-
-wait
 
 mode=$1
 echo "$0 is called with parameter: '$mode'"
@@ -81,3 +80,6 @@ case $mode in
     *)
         ;;
 esac
+
+# Block on the backgrounded python scripts so SIGINT reaches the trap
+wait
